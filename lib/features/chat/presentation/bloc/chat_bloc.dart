@@ -11,17 +11,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final GetMessages getMessages;
   final SendMessage sendMessage;
 
+  final String chatId;
+  final List<String> participants;
+
   StreamSubscription? _messagesSubscription;
 
   ChatBloc({
     required this.getMessages,
     required this.sendMessage,
+    required this.chatId,
+    required this.participants,
   }) : super(ChatInitial()) {
     on<LoadMessages>(_onLoadMessages);
     on<SendMessageEvent>(_onSendMessage);
   }
 
-  void _onLoadMessages(
+  Future<void> _onLoadMessages(
     LoadMessages event,
     Emitter<ChatState> emit,
   ) async {
@@ -29,22 +34,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     await _messagesSubscription?.cancel();
 
-    _messagesSubscription = getMessages(NoParams()).listen(
-      (messages) => add(_MessagesUpdated(messages)),
-      onError: (error) => emit(ChatError(error.toString())),
+    _messagesSubscription = getMessages(GetMessagesParams(chatId)).listen(
+      (messages) {
+        emit(ChatLoaded(messages));
+      },
+      onError: (error) {
+        emit(ChatError(error.toString()));
+      },
     );
   }
 
-  void _onSendMessage(
-    SendMessageEvent event,
-    Emitter<ChatState> emit,
-  ) async {
+  Future<void> _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {
     try {
       await sendMessage(
-        SendMessageParams(
-          text: event.text,
-          senderId: event.senderId,
-        ),
+        SendMessageParams(chatId: chatId,text: event.text,senderId: event.senderId,participants: participants,),
       );
     } catch (e) {
       emit(ChatError(e.toString()));

@@ -22,7 +22,6 @@ final sl = GetIt.instance;
 Future<void> init() async {
   // BLoC
   sl.registerFactory(() => AuthBloc(loginUser: sl(), registerUser: sl()));
-  sl.registerFactory(() => ChatBloc(getMessages: sl(), sendMessage: sl()));
 
   // UseCases
   sl.registerLazySingleton(() => LoginUser(sl()));

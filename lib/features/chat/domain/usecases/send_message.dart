@@ -9,8 +9,10 @@ class SendMessage implements UseCase<void, SendMessageParams> {
   @override
   Future<void> call(SendMessageParams params) {
     return repository.sendMessage(
-      params.text,
-      params.senderId,
+      chatId: params.chatId,
+      text: params.text,
+      senderId: params.senderId,
+      participants: params.participants,
     );
   }
 }
@@ -18,9 +20,13 @@ class SendMessage implements UseCase<void, SendMessageParams> {
 class SendMessageParams {
   final String text;
   final String senderId;
+  final String chatId;
+  final List<String> participants;
 
   SendMessageParams({
     required this.text,
     required this.senderId,
+    required this.chatId,
+    required this.participants,
   });
 }
