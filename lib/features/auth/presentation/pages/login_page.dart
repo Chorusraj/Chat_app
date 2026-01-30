@@ -1,4 +1,7 @@
 import 'package:chat_app/features/auth/presentation/pages/register_page.dart';
+import 'package:chat_app/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:chat_app/features/chat/presentation/pages/chat_page.dart';
+import 'package:chat_app/injection_container.dart' as di;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth_bloc.dart';
@@ -23,16 +26,24 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Login successful')),
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Login successful')));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => BlocProvider(
+                  create: (_) => di.sl<ChatBloc>(),
+                  child: ChatPage(currentUserId: state.user.id),
+                ),
+              ),
             );
-            // TODO: Navigate to Chat Page
           }
 
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         child: Padding(
@@ -41,17 +52,13 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               TextField(
                 controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                ),
+                decoration: const InputDecoration(labelText: 'Email'),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                ),
+                decoration: const InputDecoration(labelText: 'Password'),
               ),
               const SizedBox(height: 24),
               BlocBuilder<AuthBloc, AuthState>(
@@ -63,11 +70,11 @@ class _LoginPageState extends State<LoginPage> {
                   return ElevatedButton(
                     onPressed: () {
                       context.read<AuthBloc>().add(
-                            LoginRequested(
-                              emailController.text.trim(),
-                              passwordController.text.trim(),
-                            ),
-                          );
+                        LoginRequested(
+                          emailController.text.trim(),
+                          passwordController.text.trim(),
+                        ),
+                      );
                     },
                     child: const Text('Login'),
                   );
@@ -77,9 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const RegisterPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const RegisterPage()),
                   );
                 },
                 child: const Text('Create account'),
