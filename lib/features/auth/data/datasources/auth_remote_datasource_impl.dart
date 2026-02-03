@@ -16,10 +16,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     final user = result.user;
     if (user == null) {
-      throw FirebaseAuthException(
-        code: 'user-null',
-        message: 'User is null',
-      );
+      throw FirebaseAuthException(code: 'user-null', message: 'User is null');
     }
 
     return UserModel.fromFirebaseUser(user);
@@ -34,10 +31,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     final user = result.user;
     if (user == null) {
-      throw FirebaseAuthException(
-        code: 'user-null',
-        message: 'User is null',
-      );
+      throw FirebaseAuthException(code: 'user-null', message: 'User is null');
     }
 
     return UserModel.fromFirebaseUser(user);
@@ -46,5 +40,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> logout() async {
     await firebaseAuth.signOut();
+  }
+
+  @override
+  UserModel? getCurrentUser() {
+    final user = firebaseAuth.currentUser;
+
+    if (user == null) return null;
+
+    return UserModel.fromFirebaseUser(user);
   }
 }

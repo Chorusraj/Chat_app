@@ -34,4 +34,13 @@ class AuthRepositoryImpl implements AuthRepository {
       throw AuthFailure(e.toString());
     }
   }
+
+  @override
+  Future<UserEntity?> getCurrentUser() async {
+    try {
+      return remoteDataSource.getCurrentUser();
+    } catch (e) {
+      throw AuthFailure(e.toString());
+    }
+  }
 }
